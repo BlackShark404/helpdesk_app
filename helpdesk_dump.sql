@@ -186,3 +186,48 @@ DELETE FROM public.tickets WHERE id = 2;
 -- Check results
 SELECT * FROM public.tickets;
 SELECT * FROM public.audit_log;
+
+-- ========================================================
+-- Phase 4: Stored Procedure - Add New Student
+-- ========================================================
+
+CREATE OR REPLACE PROCEDURE public.add_new_student(
+    p_name TEXT,
+    p_email TEXT,
+    p_phone TEXT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- Validate inputs
+    IF p_name IS NULL OR TRIM(p_name) = '' THEN
+        RAISE EXCEPTION 'Student name cannot be empty';
+    END IF;
+    
+    IF p_email IS NULL OR TRIM(p_email) = '' THEN
+        RAISE EXCEPTION 'Student email cannot be empty';
+    END IF;
+    
+    -- Insert the new student
+    INSERT INTO public.students (name, email, phone)
+    VALUES (p_name, p_email, p_phone);
+    
+EXCEPTION
+    WHEN unique_violation THEN
+        RAISE EXCEPTION 'Student with email % already exists', p_email;
+    WHEN OTHERS THEN
+        RAISE EXCEPTION 'Error adding student: %', SQLERRM;
+END;
+$$;
+
+-- ========================================================
+-- Testing the stored procedure
+-- ========================================================
+-- Test 1: Add a new student with phone
+CALL public.add_new_student('Test Student', 'test.student@ctu.edu.ph', '555-9999');
+
+-- Test 2: Add a new student without phone
+CALL public.add_new_student('Another Student', 'another.student@ctu.edu.ph', NULL);
+
+-- Verify the additions
+SELECT * FROM public.students WHERE email LIKE '%test%' OR email LIKE '%another%';

@@ -254,6 +254,54 @@ def admin_students():
     
     return render_template('admin/students.html', students=students)
 
+@app.route('/admin/students/add', methods=['POST'])
+@admin_required
+def add_student():
+    name = request.form.get('name', '').strip()
+    email = request.form.get('email', '').strip()
+    phone = request.form.get('phone', '').strip() or None
+    
+    conn = get_db_connection()
+    message = None
+    message_type = 'error'
+    
+    if conn:
+        try:
+            cur = conn.cursor()
+            # Call the stored procedure using CALL statement
+            cur.execute("CALL public.add_new_student(%s, %s, %s);", (name, email, phone))
+            conn.commit()
+            cur.close()
+            message = "Student added successfully!"
+            message_type = 'success'
+        except psycopg2.errors.RaiseException as e:
+            message = str(e).split('\n')[0]
+            message_type = 'error'
+        except Exception as e:
+            print("Add student error:", e)
+            message = "An error occurred while adding the student."
+            message_type = 'error'
+        finally:
+            conn.close()
+    else:
+        message = "Database connection failed."
+    
+    # Fetch updated student list
+    conn = get_db_connection()
+    students = []
+    if conn:
+        try:
+            cur = conn.cursor()
+            cur.execute("SELECT id, name, email, phone FROM public.students ORDER BY name;")
+            students = cur.fetchall()
+            cur.close()
+        except Exception as e:
+            print("Students fetch error:", e)
+        finally:
+            conn.close()
+    
+    return render_template('admin/students.html', students=students, message=message, message_type=message_type)
+
 @app.route('/admin/staff')
 @admin_required
 def admin_staff():

@@ -11,6 +11,48 @@
     <p>View full student information (Admin access - phone numbers visible)</p>
   </div>
 
+  {% if message %}
+  <div class="alert alert-{{ message_type }}">
+    {{ message }}
+  </div>
+  {% endif %}
+
+  <div style="margin-bottom: 2rem;">
+    <button class="btn btn-primary" onclick="openModal()">
+      <i class="fas fa-plus"></i> Add Student
+    </button>
+  </div>
+
+  <!-- Modal -->
+  <div id="addStudentModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Add New Student</h2>
+        <span class="close" onclick="closeModal()">&times;</span>
+      </div>
+      <form method="POST" action="{{ url_for('add_student') }}">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="name">Name *</label>
+            <input type="text" id="name" name="name" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input type="email" id="email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="text" id="phone" name="phone" placeholder="Optional">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Student</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="table-container">
     {% if students %}
     <table>
@@ -41,5 +83,30 @@
     </div>
     {% endif %}
   </div>
+
+  <script>
+    function openModal() {
+      document.getElementById('addStudentModal').style.display = 'block';
+    }
+
+    function closeModal() {
+      document.getElementById('addStudentModal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+      const modal = document.getElementById('addStudentModal');
+      if (event.target == modal) {
+        closeModal();
+      }
+    }
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeModal();
+      }
+    });
+  </script>
 </main>
 {% endblock %}
