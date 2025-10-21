@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Ticket Queue - CCICT Helpdesk{% endblock %}
+
+{% block content %}
+{% include 'sidebar.html' %}
+
+<main class="main-content">
+  <div class="page-header">
+    <h1>Ticket Queue</h1>
+    <p>View all tickets assigned to support users</p>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Ticket ID</th>
+          <th>Student Name</th>
+          <th>Issue</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Tickets will be populated here -->
+      </tbody>
+    </table>
+  </div>
+</main>
+{% endblock %}

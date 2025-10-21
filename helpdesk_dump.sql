@@ -36,6 +36,7 @@ CREATE TABLE public.tickets (
     id SERIAL PRIMARY KEY,
     student_id INT NOT NULL REFERENCES public.students(id),
     issue TEXT NOT NULL,
+    status TEXT DEFAULT 'open',
     created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -185,24 +186,3 @@ DELETE FROM public.tickets WHERE id = 2;
 -- Check results
 SELECT * FROM public.tickets;
 SELECT * FROM public.audit_log;
-
--- ========================================================
--- Stored Function for Secure Ticket Search
--- ========================================================
-
-RESET ROLE;
-
--- Create stored function for secure ticket search
-CREATE OR REPLACE FUNCTION public.search_tickets_secure(search_query TEXT)
-RETURNS TABLE(ticket_id INT, ticket_issue TEXT) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT id, issue 
-    FROM public.tickets 
-    WHERE issue ILIKE '%' || search_query || '%';
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- Grant execute permission to roles
-GRANT EXECUTE ON FUNCTION public.search_tickets_secure(TEXT) TO support_role;
-GRANT EXECUTE ON FUNCTION public.search_tickets_secure(TEXT) TO admin_role;

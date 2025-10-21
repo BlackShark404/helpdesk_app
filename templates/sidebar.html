@@ -1,0 +1,47 @@
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h2>CCICT Helpdesk</h2>
+    <p class="user-role">{{ session.username }} ({{ session.role }})</p>
+  </div>
+  
+  <nav>
+    <ul class="sidebar-nav">
+      {% if session.role == 'admin' %}
+        <li><a href="{{ url_for('admin_dashboard') }}" class="{% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+          <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a></li>
+        <li><a href="{{ url_for('admin_tickets') }}" class="{% if request.endpoint == 'admin_tickets' %}active{% endif %}">
+          <i class="fas fa-ticket-alt"></i> Tickets
+        </a></li>
+        <li><a href="{{ url_for('admin_students') }}" class="{% if request.endpoint == 'admin_students' %}active{% endif %}">
+          <i class="fas fa-users"></i> Students
+        </a></li>
+        <li><a href="{{ url_for('admin_staff') }}" class="{% if request.endpoint == 'admin_staff' %}active{% endif %}">
+          <i class="fas fa-user-tie"></i> Staff
+        </a></li>
+        <li><a href="{{ url_for('admin_audit') }}" class="{% if request.endpoint == 'admin_audit' %}active{% endif %}">
+          <i class="fas fa-history"></i> Audit Logs
+        </a></li>
+      {% elif session.role == 'support_role' %}
+        <li><a href="{{ url_for('support_dashboard') }}" class="{% if request.endpoint == 'support_dashboard' %}active{% endif %}">
+          <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a></li>
+        <li><a href="{{ url_for('support_tickets') }}" class="{% if request.endpoint == 'support_tickets' %}active{% endif %}">
+          <i class="fas fa-ticket-alt"></i> Ticket Queue
+        </a></li>
+        <li><a href="{{ url_for('support_students') }}" class="{% if request.endpoint == 'support_students' %}active{% endif %}">
+          <i class="fas fa-users"></i> Students
+        </a></li>
+        <li><a href="{{ url_for('support_audit') }}" class="{% if request.endpoint == 'support_audit' %}active{% endif %}">
+          <i class="fas fa-history"></i> Audit Logs
+        </a></li>
+      {% endif %}
+      
+      <li style="margin-top: 30px;">
+        <a href="{{ url_for('logout') }}">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      </li>
+    </ul>
+  </nav>
+</aside>
