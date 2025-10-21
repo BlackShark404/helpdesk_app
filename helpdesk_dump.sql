@@ -110,7 +110,7 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO admin_role;
 
 SET ROLE support_user;
 SELECT * FROM public.students_support_view;
-SELECT phone FROM public.students;
+-- SELECT phone FROM public.students;
 
 RESET ROLE;
 
