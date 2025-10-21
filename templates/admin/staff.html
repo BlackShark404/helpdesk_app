@@ -2,6 +2,32 @@
 
 {% block title %}Staff Management - CCICT Helpdesk{% endblock %}
 
+{% block extra_css %}
+<style>
+  .role-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.813rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .role-admin {
+    background: rgba(79, 70, 229, 0.1);
+    color: var(--primary-color);
+    border: 1px solid rgba(79, 70, 229, 0.2);
+  }
+
+  .role-support {
+    background: rgba(6, 182, 212, 0.1);
+    color: var(--secondary-color);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 {% include 'sidebar.html' %}
 
@@ -12,19 +38,38 @@
   </div>
 
   <div class="table-container">
+    {% if staff %}
     <table>
       <thead>
         <tr>
           <th>ID</th>
           <th>Username</th>
           <th>Role</th>
-          <th>Database User</th>
         </tr>
       </thead>
       <tbody>
-        <!-- Staff will be populated here -->
+        {% for user in staff %}
+        <tr>
+          <td><strong>#{{ user[0] }}</strong></td>
+          <td>{{ user[1] }}</td>
+          <td>
+            {% if user[2] == 'admin' %}
+            <span class="role-badge role-admin">Admin</span>
+            {% else %}
+            <span class="role-badge role-support">Support</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
       </tbody>
     </table>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-user-tie"></i>
+      <h3>No Staff Found</h3>
+      <p>There are currently no staff users in the system.</p>
+    </div>
+    {% endif %}
   </div>
 </main>
 {% endblock %}

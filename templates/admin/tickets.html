@@ -2,6 +2,63 @@
 
 {% block title %}Ticket Management - CCICT Helpdesk{% endblock %}
 
+{% block extra_css %}
+<style>
+.status-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.813rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-open {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger-color);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.status-resolved {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success-color);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-icon {
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+
+.empty-state i {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  opacity: 0.3;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+}
+</style>
+{% endblock %}
+
 {% block content %}
 {% include 'sidebar.html' %}
 
@@ -12,20 +69,60 @@
   </div>
 
   <div class="table-container">
+    {% if tickets %}
     <table>
       <thead>
         <tr>
           <th>Ticket ID</th>
           <th>Student Name</th>
           <th>Issue</th>
+          <th>Status</th>
           <th>Date Created</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        <!-- Tickets will be populated here -->
+        {% for ticket in tickets %}
+        <tr>
+          <td><strong>#{{ ticket[0] }}</strong></td>
+          <td>{{ ticket[1] }}</td>
+          <td>{{ ticket[2] }}</td>
+          <td>
+            {% if ticket[3] == 'resolved' %}
+              <span class="status-badge status-resolved">Resolved</span>
+            {% else %}
+              <span class="status-badge status-open">Open</span>
+            {% endif %}
+          </td>
+          <td>{{ ticket[4].strftime('%Y-%m-%d %H:%M') if ticket[4] else 'N/A' }}</td>
+          <td>
+            <div class="action-buttons">
+              {% if ticket[3] != 'resolved' %}
+              <form action="{{ url_for('resolve_ticket', ticket_id=ticket[0]) }}" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-success btn-sm btn-icon" title="Mark as Resolved">
+                  <i class="fas fa-check"></i> Resolve
+                </button>
+              </form>
+              {% endif %}
+              <form action="{{ url_for('delete_ticket', ticket_id=ticket[0]) }}" method="post" style="display: inline;" 
+                    onsubmit="return confirm('Are you sure you want to delete this ticket?');">
+                <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete Ticket">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
       </tbody>
     </table>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-ticket-alt"></i>
+      <h3>No Tickets Found</h3>
+      <p>There are currently no tickets in the system.</p>
+    </div>
+    {% endif %}
   </div>
 </main>
 {% endblock %}

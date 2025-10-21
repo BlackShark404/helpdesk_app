@@ -2,16 +2,61 @@
 
 {% block title %}Ticket Queue - CCICT Helpdesk{% endblock %}
 
+{% block extra_css %}
+<style>
+.status-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.813rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-open {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger-color);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.status-resolved {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success-color);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+
+.empty-state i {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  opacity: 0.3;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+}
+</style>
+{% endblock %}
+
 {% block content %}
 {% include 'sidebar.html' %}
 
 <main class="main-content">
   <div class="page-header">
     <h1>Ticket Queue</h1>
-    <p>View all tickets assigned to support users</p>
+    <p>View all tickets assigned to support users (Read-only access)</p>
   </div>
 
   <div class="table-container">
+    {% if tickets %}
     <table>
       <thead>
         <tr>
@@ -19,12 +64,34 @@
           <th>Student Name</th>
           <th>Issue</th>
           <th>Status</th>
+          <th>Date Created</th>
         </tr>
       </thead>
       <tbody>
-        <!-- Tickets will be populated here -->
+        {% for ticket in tickets %}
+        <tr>
+          <td><strong>#{{ ticket[0] }}</strong></td>
+          <td>{{ ticket[1] }}</td>
+          <td>{{ ticket[2] }}</td>
+          <td>
+            {% if ticket[3] == 'resolved' %}
+              <span class="status-badge status-resolved">Resolved</span>
+            {% else %}
+              <span class="status-badge status-open">Open</span>
+            {% endif %}
+          </td>
+          <td>{{ ticket[4].strftime('%Y-%m-%d %H:%M') if ticket[4] else 'N/A' }}</td>
+        </tr>
+        {% endfor %}
       </tbody>
     </table>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-ticket-alt"></i>
+      <h3>No Tickets Found</h3>
+      <p>There are currently no tickets in the system.</p>
+    </div>
+    {% endif %}
   </div>
 </main>
 {% endblock %}

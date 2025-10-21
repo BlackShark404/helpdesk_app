@@ -180,22 +180,121 @@ def admin_dashboard():
 @app.route('/admin/tickets')
 @admin_required
 def admin_tickets():
-    return render_template('admin/tickets.html')
+    conn = get_db_connection()
+    tickets = []
+    
+    if conn:
+        try:
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT t.id, s.name, t.issue, t.status, t.created_at 
+                FROM public.tickets t
+                JOIN public.students s ON t.student_id = s.id
+                ORDER BY t.created_at DESC;
+            """)
+            tickets = cur.fetchall()
+            cur.close()
+        except Exception as e:
+            print("Tickets fetch error:", e)
+        finally:
+            conn.close()
+    
+    return render_template('admin/tickets.html', tickets=tickets)
+
+@app.route('/admin/tickets/delete/<int:ticket_id>', methods=['POST'])
+@admin_required
+def delete_ticket(ticket_id):
+    conn = get_db_connection()
+    if conn:
+        try:
+            cur = conn.cursor()
+            cur.execute("DELETE FROM public.tickets WHERE id = %s;", (ticket_id,))
+            conn.commit()
+            cur.close()
+        except Exception as e:
+            print("Delete ticket error:", e)
+        finally:
+            conn.close()
+    
+    return redirect(url_for('admin_tickets'))
+
+@app.route('/admin/tickets/resolve/<int:ticket_id>', methods=['POST'])
+@admin_required
+def resolve_ticket(ticket_id):
+    conn = get_db_connection()
+    if conn:
+        try:
+            cur = conn.cursor()
+            cur.execute("UPDATE public.tickets SET status = 'resolved' WHERE id = %s;", (ticket_id,))
+            conn.commit()
+            cur.close()
+        except Exception as e:
+            print("Resolve ticket error:", e)
+        finally:
+            conn.close()
+    
+    return redirect(url_for('admin_tickets'))
 
 @app.route('/admin/students')
 @admin_required
 def admin_students():
-    return render_template('admin/students.html')
+    conn = get_db_connection()
+    students = []
+    
+    if conn:
+        try:
+            cur = conn.cursor()
+            cur.execute("SELECT id, name, email, phone FROM public.students ORDER BY name;")
+            students = cur.fetchall()
+            cur.close()
+        except Exception as e:
+            print("Students fetch error:", e)
+        finally:
+            conn.close()
+    
+    return render_template('admin/students.html', students=students)
 
 @app.route('/admin/staff')
 @admin_required
 def admin_staff():
-    return render_template('admin/staff.html')
+    conn = get_db_connection()
+    staff = []
+    
+    if conn:
+        try:
+            cur = conn.cursor()
+            cur.execute("SELECT id, username, role FROM public.staff_users ORDER BY id;")
+            staff = cur.fetchall()
+            cur.close()
+        except Exception as e:
+            print("Staff fetch error:", e)
+        finally:
+            conn.close()
+    
+    return render_template('admin/staff.html', staff=staff)
 
 @app.route('/admin/audit')
 @admin_required
 def admin_audit():
-    return render_template('admin/audit.html')
+    conn = get_db_connection()
+    logs = []
+    
+    if conn:
+        try:
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT id, action, student_id, old_issue, new_issue, changed_at 
+                FROM public.audit_log 
+                ORDER BY changed_at DESC;
+            """)
+            logs = cur.fetchall()
+            cur.close()
+        except Exception as e:
+            print("Audit logs fetch error:", e)
+        finally:
+            conn.close()
+    
+    return render_template('admin/audit.html', logs=logs)
 
 # Support Routes
 @app.route('/support/dashboard')
@@ -230,17 +329,69 @@ def support_dashboard():
 @app.route('/support/tickets')
 @support_required
 def support_tickets():
-    return render_template('support/tickets.html')
+    conn = get_db_connection()
+    tickets = []
+    
+    if conn:
+        try:
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT t.id, s.name, t.issue, t.status, t.created_at 
+                FROM public.tickets t
+                JOIN public.students s ON t.student_id = s.id
+                ORDER BY t.created_at DESC;
+            """)
+            tickets = cur.fetchall()
+            cur.close()
+        except Exception as e:
+            print("Tickets fetch error:", e)
+        finally:
+            conn.close()
+    
+    return render_template('support/tickets.html', tickets=tickets)
 
 @app.route('/support/students')
 @support_required
 def support_students():
-    return render_template('support/students.html')
+    conn = get_db_connection()
+    students = []
+    
+    if conn:
+        try:
+            cur = conn.cursor()
+            # Use the restricted view for support users
+            cur.execute("SELECT id, name, email, phone FROM public.students_support_view ORDER BY name;")
+            students = cur.fetchall()
+            cur.close()
+        except Exception as e:
+            print("Students fetch error:", e)
+        finally:
+            conn.close()
+    
+    return render_template('support/students.html', students=students)
 
 @app.route('/support/audit')
 @support_required
 def support_audit():
-    return render_template('support/audit.html')
+    conn = get_db_connection()
+    logs = []
+    
+    if conn:
+        try:
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT id, action, student_id, old_issue, new_issue, changed_at 
+                FROM public.audit_log 
+                ORDER BY changed_at DESC;
+            """)
+            logs = cur.fetchall()
+            cur.close()
+        except Exception as e:
+            print("Audit logs fetch error:", e)
+        finally:
+            conn.close()
+    
+    return render_template('support/audit.html', logs=logs)
 
 if __name__ == '__main__':
     app.run(debug=True)

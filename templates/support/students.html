@@ -2,16 +2,53 @@
 
 {% block title %}Student Records - CCICT Helpdesk{% endblock %}
 
+{% block extra_css %}
+<style>
+.restricted-field {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.info-banner {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.info-banner i {
+  color: var(--warning-color);
+  font-size: 1.25rem;
+}
+
+.info-banner p {
+  margin: 0;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 {% include 'sidebar.html' %}
 
 <main class="main-content">
   <div class="page-header">
     <h1>Student Records (Limited Access)</h1>
-    <p>View basic student data (Phone numbers hidden)</p>
+    <p>View basic student data (Phone numbers hidden for support role)</p>
+  </div>
+
+  <div class="info-banner">
+    <i class="fas fa-info-circle"></i>
+    <p>Phone numbers are restricted for support users. Contact an administrator for full access.</p>
   </div>
 
   <div class="table-container">
+    {% if students %}
     <table>
       <thead>
         <tr>
@@ -22,9 +59,31 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Students will be populated here (phone hidden) -->
+        {% for student in students %}
+        <tr>
+          <td><strong>#{{ student[0] }}</strong></td>
+          <td>{{ student[1] }}</td>
+          <td>{{ student[2] }}</td>
+          <td>
+            {% if student[3] %}
+              {{ student[3] }}
+            {% else %}
+              <span class="restricted-field">
+                <i class="fas fa-lock"></i> Restricted
+              </span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
       </tbody>
     </table>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-users"></i>
+      <h3>No Students Found</h3>
+      <p>There are currently no students in the system.</p>
+    </div>
+    {% endif %}
   </div>
 </main>
 {% endblock %}

@@ -2,6 +2,50 @@
 
 {% block title %}Audit Logs - CCICT Helpdesk{% endblock %}
 
+{% block extra_css %}
+<style>
+.action-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.813rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.action-insert {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success-color);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.action-update {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--warning-color);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.action-delete {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger-color);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.issue-text {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.issue-arrow {
+  color: var(--text-secondary);
+  margin: 0 8px;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 {% include 'sidebar.html' %}
 
@@ -12,6 +56,7 @@
   </div>
 
   <div class="table-container">
+    {% if logs %}
     <table>
       <thead>
         <tr>
@@ -23,9 +68,40 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Audit logs will be populated here -->
+        {% for log in logs %}
+        <tr>
+          <td>
+            {% if log[1] == 'INSERT' %}
+              <span class="action-badge action-insert">Insert</span>
+            {% elif log[1] == 'UPDATE' %}
+              <span class="action-badge action-update">Update</span>
+            {% elif log[1] == 'DELETE' %}
+              <span class="action-badge action-delete">Delete</span>
+            {% endif %}
+          </td>
+          <td><strong>#{{ log[2] }}</strong></td>
+          <td>
+            <span class="issue-text" title="{{ log[3] if log[3] else 'N/A' }}">
+              {{ log[3] if log[3] else '—' }}
+            </span>
+          </td>
+          <td>
+            <span class="issue-text" title="{{ log[4] if log[4] else 'N/A' }}">
+              {{ log[4] if log[4] else '—' }}
+            </span>
+          </td>
+          <td>{{ log[5].strftime('%Y-%m-%d %H:%M:%S') if log[5] else 'N/A' }}</td>
+        </tr>
+        {% endfor %}
       </tbody>
     </table>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-history"></i>
+      <h3>No Audit Logs Found</h3>
+      <p>There are currently no audit logs in the system.</p>
+    </div>
+    {% endif %}
   </div>
 </main>
 {% endblock %}

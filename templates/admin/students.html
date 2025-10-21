@@ -8,10 +8,11 @@
 <main class="main-content">
   <div class="page-header">
     <h1>Student Records</h1>
-    <p>View full student information</p>
+    <p>View full student information (Admin access - phone numbers visible)</p>
   </div>
 
   <div class="table-container">
+    {% if students %}
     <table>
       <thead>
         <tr>
@@ -22,9 +23,23 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Students will be populated here -->
+        {% for student in students %}
+        <tr>
+          <td><strong>#{{ student[0] }}</strong></td>
+          <td>{{ student[1] }}</td>
+          <td>{{ student[2] }}</td>
+          <td>{{ student[3] if student[3] else 'N/A' }}</td>
+        </tr>
+        {% endfor %}
       </tbody>
     </table>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-users"></i>
+      <h3>No Students Found</h3>
+      <p>There are currently no students in the system.</p>
+    </div>
+    {% endif %}
   </div>
 </main>
 {% endblock %}
