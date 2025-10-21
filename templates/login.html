@@ -2,52 +2,176 @@
 
 {% block title %}Login - CCICT Helpdesk{% endblock %}
 
+{% block extra_css %}
+<style>
+.login-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 60px 20px;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.login-header h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -1px;
+}
+
+.login-header p {
+  color: var(--text-secondary);
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.login-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+.login-card {
+  background: var(--card-bg);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.login-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-xl);
+}
+
+.login-card h2 {
+  font-size: 1.75rem;
+  margin-bottom: 30px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.938rem;
+}
+
+.password-wrapper {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+  padding: 8px;
+}
+
+.password-toggle:hover {
+  color: var(--primary-color);
+}
+
+.message {
+  margin-top: 20px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.938rem;
+}
+
+.message.error {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger-color);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.message.success {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success-color);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+@media (max-width: 768px) {
+  .login-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .login-header h1 {
+    font-size: 2.25rem;
+  }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container" style="max-width: 1000px; margin-top: 50px;">
-  <header style="text-align: center; margin-bottom: 40px;">
-    <h1 style="font-size: 2.5rem; font-weight: bold;">CCICT Helpdesk</h1>
-    <p style="color: var(--text-secondary);">DBMS Security Lab</p>
+<div class="login-container">
+  <header class="login-header">
+    <h1>CCICT Helpdesk</h1>
+    <p>Database Management Security Lab</p>
   </header>
 
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+  <div class="login-grid">
     <!-- Login Form -->
-    <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-      <h2 style="margin-bottom: 20px;">Staff Login</h2>
+    <div class="login-card">
+      <h2>Staff Login</h2>
       <form action="{{ url_for('login') }}" method="post">
-        <div style="margin-bottom: 15px;">
-          <input type="text" name="username" placeholder="Username" required
-            style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="Enter your username" required>
         </div>
-        <div style="margin-bottom: 15px; position: relative;">
-          <input type="password" id="password" name="password" placeholder="Password" required
-            style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-          <button type="button" id="togglePassword" 
-            style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer;">
-            <i class="fas fa-eye" style="color: var(--text-secondary);"></i>
-          </button>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            <button type="button" class="password-toggle" id="togglePassword">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%;">Log In</button>
         {% if login_message %}
-          <p style="color: var(--danger-color); margin-top: 15px; text-align: center;">{{ login_message }}</p>
+          <div class="message error">{{ login_message }}</div>
         {% endif %}
       </form>
     </div>
 
     <!-- New Ticket Form -->
-    <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-      <h2 style="margin-bottom: 20px;">Create Ticket</h2>
+    <div class="login-card">
+      <h2>Create Ticket</h2>
       <form action="{{ url_for('submit_ticket') }}" method="post">
-        <div style="margin-bottom: 15px;">
-          <input type="text" name="student_id" placeholder="Student ID" required
-            style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+        <div class="form-group">
+          <label for="student_id">Student ID</label>
+          <input type="text" id="student_id" name="student_id" placeholder="Enter your student ID" required>
         </div>
-        <div style="margin-bottom: 15px;">
-          <textarea name="issue" placeholder="Describe your issue..." rows="4" required
-            style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;"></textarea>
+        <div class="form-group">
+          <label for="issue">Issue Description</label>
+          <textarea id="issue" name="issue" placeholder="Describe your issue in detail..." rows="5" required></textarea>
         </div>
         <button type="submit" class="btn btn-success" style="width: 100%;">Submit Ticket</button>
         {% if ticket_message %}
-          <p style="color: var(--secondary-color); margin-top: 15px; text-align: center;">{{ ticket_message }}</p>
+          <div class="message success">{{ ticket_message }}</div>
         {% endif %}
       </form>
     </div>
